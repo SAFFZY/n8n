@@ -1,0 +1,237 @@
+{
+  "name": "My workflow 7",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "documentId": {
+          "__rl": true,
+          "value": "15ljQoUNgNoo-Y5VgGXJoP0VQp2I7ThKkNs_z90I5Mc0",
+          "mode": "list",
+          "cachedResultName": "topics",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/15ljQoUNgNoo-Y5VgGXJoP0VQp2I7ThKkNs_z90I5Mc0/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/15ljQoUNgNoo-Y5VgGXJoP0VQp2I7ThKkNs_z90I5Mc0/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "efc993dd-88fa-486f-b123-74511e49e452",
+      "name": "Google Sheets Trigger",
+      "credentials": {
+        "googleSheetsTriggerOAuth2Api": {
+          "id": "whkckhDqvlaIg8ft",
+          "name": "Google Sheets Trigger account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "repository",
+        "operation": "__CUSTOM_API_CALL__",
+        "owner": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "repository": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        }
+      },
+      "type": "n8n-nodes-base.github",
+      "typeVersion": 1.1,
+      "position": [
+        192,
+        224
+      ],
+      "id": "6a7692ed-8e12-40ee-b266-7a645e28b507",
+      "name": "__CUSTOM_API_CALL__ repository",
+      "webhookId": "d45aa622-1915-4395-acc2-5024c082eb44",
+      "credentials": {
+        "githubApi": {
+          "id": "4P038KnuVuvsKV1U",
+          "name": "GitHub account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "url": "https://api.github.com/search/repositories",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "githubApi",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "q",
+              "value": "={{ $json.Topic }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        160,
+        0
+      ],
+      "id": "d65413a7-9e1f-4959-a979-8e4fdbe67a31",
+      "name": "HTTP Request",
+      "credentials": {
+        "githubApi": {
+          "id": "4P038KnuVuvsKV1U",
+          "name": "GitHub account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = [];\n// Loop through the HTTP Request node's response\nfor (const item of $input.all()) {\n  // Access the repositories directly from item.json.items\n  for (const repository of item.json.items) {\n    items.push({\n      json: {\n        'GitHub Links': repository.html_url\n      }\n    });\n  }\n}\nreturn items;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        368,
+        19.23046875
+      ],
+      "id": "4b26b67b-e116-4f4b-8fb3-c5b5a0b572aa",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "15ljQoUNgNoo-Y5VgGXJoP0VQp2I7ThKkNs_z90I5Mc0",
+          "mode": "list",
+          "cachedResultName": "topics",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/15ljQoUNgNoo-Y5VgGXJoP0VQp2I7ThKkNs_z90I5Mc0/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/15ljQoUNgNoo-Y5VgGXJoP0VQp2I7ThKkNs_z90I5Mc0/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Status": "={{ $json['GitHub Links'] }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Topic",
+              "displayName": "Topic",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        576,
+        16
+      ],
+      "id": "ec236d51-a013-4a16-a84b-16a2fa4d1e17",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "7zOShS9QOclkxEg6",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Sheets Trigger": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "__CUSTOM_API_CALL__ repository": {
+      "main": [
+        []
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "d02b2b7e-5601-4725-9d91-ea66a7b89ac8",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "a1f70129cf38e1588fdf1352fb2611ced131fec56e862bd7c92c4c9009d0841a"
+  },
+  "id": "vuSqxgujHbwTEZHs",
+  "tags": []
+}

@@ -1,0 +1,243 @@
+{
+  "name": "image to url",
+  "nodes": [
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.imgbb.com/1/upload",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-type",
+              "value": "multipart/form-data"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "image",
+              "inputDataFieldName": "data"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "687d4296-2bd0-41e3-ba3d-994077c23133",
+      "name": "Upload Img to ImgBB for URL",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        448,
+        160
+      ],
+      "notesInFlow": true,
+      "typeVersion": 4.2
+    },
+    {
+      "parameters": {
+        "url": "=http://api.resmush.it/ws.php?img={{ $json.data.url }}",
+        "options": {}
+      },
+      "id": "fe1dc195-1a30-40de-99c0-524184907e69",
+      "name": "ReSmush.it Image Optimisation",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        656,
+        160
+      ],
+      "notesInFlow": true,
+      "typeVersion": 4.2
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.imgbb.com/1/upload",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-type",
+              "value": "application/x-www-form-urlencoded"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "image",
+              "value": "={{ $json.dest }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "0985dc1f-bcfa-41c9-85e0-79ba49d4ca9e",
+      "name": "Store Optimised Image ImgBB",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        880,
+        160
+      ],
+      "notesInFlow": true,
+      "typeVersion": 4.2
+    },
+    {
+      "parameters": {
+        "content": "**Image Prompt**\n\nPrompt takes input of image description from the `set image description` node and generates using OpenAI",
+        "height": 320.9196076003899,
+        "width": 415.48118604428106,
+        "color": 7
+      },
+      "id": "76447cd9-1ee6-42c3-ac7e-26e05ded0b96",
+      "name": "Sticky Note50",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        0
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "**Upload image to ImgBB, Optimise using ReSmush.it and store as URL**\n",
+        "height": 320.9196076003899,
+        "width": 619.0692735087202,
+        "color": 7
+      },
+      "id": "2be661e5-bfb2-4885-b281-d7b614cf66b5",
+      "name": "Sticky Note51",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        416,
+        0
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "9026b5d5-97ed-484e-a168-ac1c57a60fa1",
+              "name": "description",
+              "type": "string",
+              "value": "=Balancing Autonomy and Human Interaction in AI Applications, featuring a person"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "6fc330db-8181-46e1-b2b0-e52cf327d5f9",
+      "name": "Set image description",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        32,
+        160
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "prompt": "=Create a minimalist professional illustration of {{ $json.description }} with these specifications:\n\n1. Visual Style:\n- Modern tech-focused minimalist design\n- Clean, uncluttered composition\n- Professional business aesthetic\n- Soft shadows and subtle depth\n- 2-3 primary colors maximum plus white space\n\n2. Core Elements:\n- Main icon/symbol representing {{ $json.description }} as focal point\n- Simple supporting elements representing key sections\n- Subtle connecting elements showing relationship\n- Plenty of white space (40% minimum)\n- No text overlay\n\n3. Technical Requirements:\n- High contrast for clarity\n- Crisp edges and smooth lines\n- Professional lighting from upper left\n- Matte finish\n- Square aspect ratio (1:1)",
+        "options": {}
+      },
+      "id": "b50faaf1-edd1-4e54-9ad3-10cfbee47c31",
+      "name": "Generate Image",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "position": [
+        240,
+        160
+      ],
+      "typeVersion": 1.4
+    },
+    {
+      "parameters": {},
+      "id": "e74d45b2-7c4f-485d-a622-b49d0099ff34",
+      "name": "No Operation, do nothing",
+      "type": "n8n-nodes-base.noOp",
+      "position": [
+        1088,
+        160
+      ],
+      "typeVersion": 1
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Upload Img to ImgBB for URL": {
+      "main": [
+        [
+          {
+            "node": "ReSmush.it Image Optimisation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ReSmush.it Image Optimisation": {
+      "main": [
+        [
+          {
+            "node": "Store Optimised Image ImgBB",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Store Optimised Image ImgBB": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set image description": {
+      "main": [
+        [
+          {
+            "node": "Generate Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Image": {
+      "main": [
+        [
+          {
+            "node": "Upload Img to ImgBB for URL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "5c54733b-88e5-4d1d-8f03-a447f64324a6",
+  "meta": {
+    "instanceId": "7a9b59bb0548430353c23071159396a925774ef4fb62fb4b4c96896982f6e897"
+  },
+  "id": "fROgzJYoZ7NnhRBl",
+  "tags": []
+}
